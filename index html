@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thesaurusdokter Spreekuur</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="caduceus">⚕</div>
+        <div class="brand-text">
+          <div class="title">Thesaurusdokter</div>
+          <div class="subtitle">Spreekuur voor terminologiebronnen</div>
+        </div>
+      </div>
+      <div class="status-pill" id="overallStatusPill">
+        Nog geen diagnose
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- Stap 1: Intake -->
+    <section class="card" id="intakeSection">
+      <h2 class="card-title">1. Anamnese</h2>
+      <p class="card-intro">
+        Waar doet het pijn in uw thesaurus? Vul hieronder in. Uw antwoorden blijven in uw browser.
+      </p>
+
+      <div class="form-row">
+        <label>Naam organisatie</label>
+        <input id="orgName" type="text" placeholder="Bijv. Regionaal Archief Nijmegen" />
+      </div>
+
+      <div class="form-row">
+        <label>Naam termenbron / thesaurus / lijst</label>
+        <input id="sourceName" type="text" placeholder="Bijv. Vrouwenthesaurus" />
+      </div>
+
+      <div class="form-row">
+        <label>Wie beheert deze bron?</label>
+        <input id="ownerName" type="text" placeholder="Bijv. Afdeling Collectie & Onderzoek" />
+      </div>
+
+      <div class="form-row">
+        <label>Welke klachten herkent u?</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" class="symptom" value="dubbele_termen" /> Dubbele termen / synoniemenstrijd</label>
+          <label><input type="checkbox" class="symptom" value="verouderd" /> Verouderde of inconsistente termen</label>
+          <label><input type="checkbox" class="symptom" value="onduidelijke_hierarchie" /> Onduidelijke hiërarchie / structuur</label>
+          <label><input type="checkbox" class="symptom" value="niet_vindbaar" /> Niet goed vindbaar in systemen</label>
+          <label><input type="checkbox" class="symptom" value="overlap" /> Overlap tussen meerdere termenbronnen</label>
+          <label><input type="checkbox" class="symptom" value="geen_beheer" /> Geen vaste eigenaar / geen onderhoud</label>
+          <label><input type="checkbox" class="symptom" value="geen_koppeling" /> Niet of nauwelijks gekoppeld aan Termennetwerk / andere bronnen</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Anders, namelijk</label>
+        <input id="otherSymptom" type="text" placeholder="Bijv. licentie onduidelijk / geen URI's / niemand begrijpt termen" />
+      </div>
+
+      <button class="primary-btn" id="diagnoseBtn">
+        Stel diagnose
+      </button>
+    </section>
+
+
+    <!-- Stap 2: Diagnose -->
+    <section class="card" id="diagnoseSection">
+      <h2 class="card-title">2. Diagnose</h2>
+      <p class="card-intro">
+        Eerste beoordeling door de Thesaurusdokter. Dit is geen oordeel, dit is richting.
+      </p>
+
+      <div class="diagnose-block">
+        <div class="diagnose-label">Ernstinschatting</div>
+        <div class="diagnose-value" id="severityText">
+          Nog niet bepaald
+        </div>
+      </div>
+
+      <div class="diagnose-block">
+        <div class="diagnose-label">Kernrisico's</div>
+        <ul class="bullet-list" id="riskList">
+          <li>(nog leeg)</li>
+        </ul>
+      </div>
+
+      <div class="diagnose-block">
+        <div class="diagnose-label">Samenvatting</div>
+        <div class="diagnose-summary" id="summaryText">
+          Vul eerst de anamnese in en kies "Stel diagnose".
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Stap 3: Recept -->
+    <section class="card" id="receptSection">
+      <h2 class="card-title">3. Recept</h2>
+      <p class="card-intro">
+        Aanbevolen behandeling. U kunt dit straks downloaden als PDF.
+      </p>
+
+      <div class="recept-group" id="receptList">
+        <div class="recept-item recept-placeholder">
+          Nog geen recept. Vul eerst de anamnese in.
+        </div>
+      </div>
+
+      <div class="recept-footnote">
+        Bijwerkingen: meer duidelijkheid, minder chaos, betere herbruikbaarheid.
+      </div>
+
+      <button class="secondary-btn" id="downloadBtn">
+        Download Gezondheidsverklaring (PDF)
+      </button>
+    </section>
+
+
+    <!-- Stap 4: Verklaring -->
+    <section class="card" id="verklaringSection">
+      <h2 class="card-title">4. Gezondheidsverklaring</h2>
+      <p class="card-intro">
+        Deze verklaring wordt meegestuurd in de PDF. U kunt dit gebruiken binnen uw organisatie.
+      </p>
+
+      <table class="verklaring-table">
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Gezond</th>
+            <th>Aandacht nodig</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Er is een vaste beheerder</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>De lijst is gedocumenteerd (scope, licentie, structuur)</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Terminologie is actueel en bruikbaar</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Er zijn koppelingen met Termennetwerk of andere bronnen</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Synoniemen en hiërarchie zijn gecontroleerd</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Gebruikers geven feedback</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Er is een exitstrategie bij onderhoudsstop</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>De bron is open beschikbaar (LOD)</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>Governance is vastgelegd</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+          <tr>
+            <td>U herkent uw eigen termen zonder zoekpijn</td>
+            <td>☐</td>
+            <td>☐</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="verklaring-footer">
+        <div>Eindoordeel van de Thesaurusdokter: <span id="finalStatus">Nog niet bepaald</span></div>
+        <div class="signature-row">
+          Handtekening dokter: ___________________________
+        </div>
+        <div class="signature-row">
+          Datum: ___________________________
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      Spreekuur zonder wachtlijst. Raadpleeg bij twijfel uw Thesaurusdokter.
+    </div>
+  </footer>
+
+  <!-- jsPDF via CDN (gebruiker kan later de repo zelf voorzien van bundling indien gewenst) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
