@@ -38,7 +38,7 @@ Deze webapp is ontwikkeld voor de **NDE Termendag** als lichte, humoristische ma
 1. Ga naar [https://jolietjakeblues.github.io/Thesaurusdokter/](https://jolietjakeblues.github.io/Thesaurusdokter/)
 2. Ga naar
 [https://thesaurusdokter.nl/]
-(https://thesaurusdokter.nl/]
+(https://thesaurusdokter.nl/)
 4. Vul de velden in bij *Anamnese*.
 5. Klik op **Stel diagnose**.
 6. Bekijk uw diagnose en recept.
