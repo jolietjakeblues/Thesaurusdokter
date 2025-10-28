@@ -245,7 +245,7 @@ function renderRecept(container, recepts) {
   });
 }
 
-  // PDF export
+      // PDF export
 async function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -255,7 +255,7 @@ async function exportPDF() {
   const sev = document.getElementById("severityText").textContent || "";
   const finalStatus = document.getElementById("finalStatus").textContent || "";
 
-  // PAGINA 1
+  // ---------- PAGINA 1 ----------
   let y = 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
@@ -278,7 +278,7 @@ async function exportPDF() {
     const title = block.querySelector(".recept-item-title")?.textContent?.trim();
     if (!title) return;
 
-    // Titel
+    // Titel van het receptblok
     doc.setFont("helvetica", "bold");
     doc.text("• " + title, 10, y);
     y += 5;
@@ -291,7 +291,7 @@ async function exportPDF() {
         doc.addPage();
         y = 10;
       }
-      // wrap lange regels
+      // tekst wrappen zodat regels niet buiten beeld lopen
       const wrapped = doc.splitTextToSize("   " + line, 180);
       wrapped.forEach(wline => {
         doc.text(wline, 10, y);
@@ -325,27 +325,35 @@ async function exportPDF() {
     y
   );
 
-  // PAGINA 2
+  // ---------- PAGINA 2 ----------
   doc.addPage();
+
+  // Koptekst checklist
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Gezondheidsverklaring (checklist)", 10, 20);
 
+  // dun rood/grijs lijntje onder de kop voor visuele scheiding
+  doc.setDrawColor(150, 0, 0);     // donkerrood-achtig
+  doc.setLineWidth(0.3);
+  doc.line(10, 24, 200, 24);
+
+  // We maken de tabeldata ASCII-safe. Geen rare Unicode (☐ etc.), maar [ ].
   const tableData = [
     ["Aspect", "Gezond", "Aandacht nodig"],
-    ["Er is een vaste beheerder", "☐", "☐"],
-    ["De lijst is gedocumenteerd (scope, licentie, structuur)", "☐", "☐"],
-    ["Terminologie is actueel en bruikbaar", "☐", "☐"],
-    ["Er zijn koppelingen met Termennetwerk of andere bronnen", "☐", "☐"],
-    ["Synoniemen en hiërarchie zijn gecontroleerd", "☐", "☐"],
-    ["Gebruikers geven feedback", "☐", "☐"],
-    ["Er is een exitstrategie bij onderhoudsstop", "☐", "☐"],
-    ["De bron is open beschikbaar (LOD)", "☐", "☐"],
-    ["Governance is vastgelegd", "☐", "☐"],
-    ["U herkent uw eigen termen zonder zoekpijn", "☐", "☐"]
+    ["Er is een vaste beheerder", "[ ]", "[ ]"],
+    ["De lijst is gedocumenteerd (scope, licentie, structuur)", "[ ]", "[ ]"],
+    ["Terminologie is actueel en bruikbaar", "[ ]", "[ ]"],
+    ["Er zijn koppelingen met Termennetwerk of andere bronnen", "[ ]", "[ ]"],
+    ["Synoniemen en hiërarchie zijn gecontroleerd", "[ ]", "[ ]"],
+    ["Gebruikers geven feedback", "[ ]", "[ ]"],
+    ["Er is een exitstrategie bij onderhoudsstop", "[ ]", "[ ]"],
+    ["De bron is open beschikbaar (LOD)", "[ ]", "[ ]"],
+    ["Governance is vastgelegd", "[ ]", "[ ]"],
+    ["U herkent uw eigen termen zonder zoekpijn", "[ ]", "[ ]"]
   ];
 
-  // 1. Mooie tabel als autoTable beschikbaar is
+  // 1. Mooie tabel via autoTable als die beschikbaar is
   if (window.jspdf && window.jspdf.autoTable) {
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
@@ -362,54 +370,93 @@ async function exportPDF() {
       headStyles: {
         fillColor: [255, 230, 230],
         textColor: [0, 0, 0]
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
       }
     });
 
-  // 2. Eigen fallback (mooier dan de oude)
+  // 2. Onze eigen fallback als autoTable niet werkt / niet geladen is
   } else {
-    let tableY = 30;
+    let tableY = 32; // begin iets onder de lijn
+    const leftX = 10;
+    const colGezondX = 140;
+    const colAandachtX = 170;
+    const maxWidthAspect = 125;
 
     // kolomtitels
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.text("Aspect", 10, tableY);
-    doc.text("Gezond", 140, tableY);
-    doc.text("Aandacht", 170, tableY);
-    tableY += 8;
+    doc.text("Aspect", leftX, tableY);
+    doc.text("Gezond", colGezondX, tableY);
+    doc.text("Aandacht", colAandachtX, tableY);
+    tableY += 4;
 
+    // dun lijnetje onder de kolomtitels
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.2);
+    doc.line(leftX, tableY, 200, tableY);
+    tableY += 4;
+
+    // rijen
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
 
-    tableData.slice(1).forEach(row => {
+    tableData.slice(1).forEach((row, idx) => {
       const [aspect, gezond, aandacht] = row;
 
+      // nieuwe pagina als we te ver zijn
       if (tableY > 270) {
         doc.addPage();
         tableY = 20;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("Aspect", leftX, tableY);
+        doc.text("Gezond", colGezondX, tableY);
+        doc.text("Aandacht", colAandachtX, tableY);
+        tableY += 4;
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.2);
+        doc.line(leftX, tableY, 200, tableY);
+        tableY += 4;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
       }
 
-      // aspect kan lang zijn, dus netjes wrappen in max 125px breed
-      const wrappedAspect = doc.splitTextToSize(aspect, 125);
+      // subtiele grijstint achtergrond voor om-en-om rijen
+      if (idx % 2 === 0) {
+        doc.setFillColor(245, 245, 245); // lichtgrijs
+        // rechthoek op volledige rijhoogte (we tekenen 'm eerst, dan tekst erover)
+        // rijhoogte schatten we op ~8 + wrap. We tekenen dynamisch per regel.
+      }
 
+      // we maken de aspecttekst veilig ASCII (geen rare unicode quotes)
+      const safeAspect = aspect.replace(/[^\x00-\x7F]/g, "");
+      const wrappedAspect = doc.splitTextToSize(safeAspect, maxWidthAspect);
+
+      // we gaan eerst de achtergrond tekenen voor het aantal regels dat we straks schrijven
+      // bereken hoogte van deze rij:
+      const rowHeight = wrappedAspect.length * 6 + 2; // 6 per regel + marge
+
+      if (idx % 2 === 0) {
+        doc.rect(leftX - 2, tableY - 5, 192, rowHeight, "F");
+      }
+
+      // schrijf de tekstregels van de "Aspect" kolom
+      let innerY = tableY;
       wrappedAspect.forEach((line, i) => {
-        doc.text(line, 10, tableY);
-
-        // "Gezond" en "Aandacht nodig" maar één keer per rij (op de eerste regel)
+        doc.text(line, leftX, innerY);
+        // Gezond / Aandacht alleen op de eerste regel van deze rij
         if (i === 0) {
-          doc.text(gezond, 140, tableY);
-          doc.text(aandacht, 170, tableY);
+          doc.text(gezond, colGezondX, innerY);
+          doc.text(aandacht, colAandachtX, innerY);
         }
-
-        tableY += 6;
+        innerY += 6;
       });
 
-      tableY += 2; // extra witruimte tussen rijen
+      tableY = tableY + rowHeight;
     });
   }
-
-  // Download
-  doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
-}
 
   // Download
   doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
