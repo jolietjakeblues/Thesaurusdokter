@@ -36,17 +36,13 @@ Deze webapp is ontwikkeld voor de **NDE Termendag** als lichte, humoristische ma
 ## Gebruik
 
 1. Ga naar [https://jolietjakeblues.github.io/Thesaurusdokter/](https://jolietjakeblues.github.io/Thesaurusdokter/)
-2. Vul de velden in bij *Anamnese*.
-3. Klik op **Stel diagnose**.
-4. Bekijk uw diagnose en recept.
-5. Klik op **Download Gezondheidsverklaring (PDF)** om het resultaat op te slaan.
-
----
-
-## Credits
-
-Concept en inhoud: **De Thesaurusdokter**  
-Versie: *Pilot voor NDE Termendag 2025*  
+2. Ga naar
+[https://thesaurusdokter.nl/]
+(https://thesaurusdokter.nl/]
+4. Vul de velden in bij *Anamnese*.
+5. Klik op **Stel diagnose**.
+6. Bekijk uw diagnose en recept.
+7. Klik op **Download Gezondheidsverklaring (PDF)** om het resultaat op te slaan.
 
 ---
 
