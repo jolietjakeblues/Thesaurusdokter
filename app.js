@@ -245,7 +245,7 @@ function renderRecept(container, recepts) {
   });
 }
 
-// PDF export
+  // PDF export
 async function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -291,8 +291,12 @@ async function exportPDF() {
         doc.addPage();
         y = 10;
       }
-      doc.text("   " + line, 10, y);
-      y += 5;
+      // wrap lange regels
+      const wrapped = doc.splitTextToSize("   " + line, 180);
+      wrapped.forEach(wline => {
+        doc.text(wline, 10, y);
+        y += 5;
+      });
     });
 
     y += 3;
@@ -341,7 +345,7 @@ async function exportPDF() {
     ["U herkent uw eigen termen zonder zoekpijn", "☐", "☐"]
   ];
 
-  // Heeft de browser autoTable?
+  // 1. Mooie tabel als autoTable beschikbaar is
   if (window.jspdf && window.jspdf.autoTable) {
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
@@ -360,28 +364,52 @@ async function exportPDF() {
         textColor: [0, 0, 0]
       }
     });
+
+  // 2. Eigen fallback (mooier dan de oude)
   } else {
-    // Fallback als autoTable niet geladen is
     let tableY = 30;
+
+    // kolomtitels
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("Aspect", 10, tableY);
+    doc.text("Gezond", 140, tableY);
+    doc.text("Aandacht", 170, tableY);
+    tableY += 8;
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
 
-    tableData.forEach((row, idx) => {
-      const line = row.join(" | ");
+    tableData.slice(1).forEach(row => {
+      const [aspect, gezond, aandacht] = row;
+
       if (tableY > 270) {
         doc.addPage();
         tableY = 20;
       }
-      if (idx === 0) {
-        doc.setFont("helvetica", "bold");
+
+      // aspect kan lang zijn, dus netjes wrappen in max 125px breed
+      const wrappedAspect = doc.splitTextToSize(aspect, 125);
+
+      wrappedAspect.forEach((line, i) => {
         doc.text(line, 10, tableY);
-        doc.setFont("helvetica", "normal");
-      } else {
-        doc.text(line, 10, tableY);
-      }
-      tableY += 7;
+
+        // "Gezond" en "Aandacht nodig" maar één keer per rij (op de eerste regel)
+        if (i === 0) {
+          doc.text(gezond, 140, tableY);
+          doc.text(aandacht, 170, tableY);
+        }
+
+        tableY += 6;
+      });
+
+      tableY += 2; // extra witruimte tussen rijen
     });
   }
+
+  // Download
+  doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
+}
 
   // Download
   doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
