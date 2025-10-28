@@ -6,13 +6,13 @@
 - Nieuwe toon: termen als ruggengraat voor vindbaarheid, hergebruik en samenwerking.
 - Motto toegevoegd:
   - "Samen werken aan betekenis. De Thesaurusdokter helpt u uw termen gezond en verbonden te houden."
-  - "BaaS — Betekenis as a Service."
+  - "BaaS: Betekenis as a Service."
 
 ### UI / content
 - Intake- en diagnose-teksten verduidelijkt: minder technisch, meer richting samenwerking.
 - Sectietitel "Advies van de Thesaurusdokter" hernoemd naar "Recept voor gezonde verbindingen".
 - Footertekst in de webapp aangepast naar:
-  - "Samen werken aan betekenis — Betekenis as a Service."
+  - "Samen werken aan betekenis - Betekenis as a Service."
 
 ### PDF-output
 - PDF-download bevat nu:
