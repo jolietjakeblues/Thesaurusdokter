@@ -1,4 +1,4 @@
-# Thesaurusdokter – Spreekuur voor terminologiebronnen
+# Thesaurusdokter: Spreekuur voor terminologiebronnen
 
 De **Thesaurusdokter** helpt instellingen om de gezondheid van hun terminologiebronnen te beoordelen.  
 Tijdens het spreekuur kunt u klachten invullen, een diagnose laten stellen en een recept of gezondheidsverklaring downloaden.
@@ -20,7 +20,7 @@ Deze webapp is ontwikkeld voor de **NDE Termendag** als lichte, humoristische ma
 
 4. **Gezondheidsverklaring**  
    De gebruiker kan een PDF downloaden met alle ingevulde gegevens en aanbevelingen.  
-   Alles gebeurt in de browser – er wordt niets opgeslagen of verzonden.
+   Alles gebeurt in de browser, er wordt niets opgeslagen of verzonden.
 
 ---
 
