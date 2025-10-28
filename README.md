@@ -1,4 +1,4 @@
-# Thesaurusdokter – Spreekuur
+# Thesaurusdokter - spreekuur
 
 De Thesaurusdokter is een lichte webapp voor het spreekuur rond uw terminologiebron / thesaurus.
 
@@ -13,7 +13,7 @@ Deze versie is ontwikkeld voor de studiedag
 De kern:
 - Termen zijn niet alleen labels. Ze zijn infrastructuur.
 - Gezonde termen maken vindbaarheid mogelijk, voorkomen misverstanden en zorgen dat systemen elkaar begrijpen.
-- Of in kort: **BaaS — Betekenis as a Service.**
+- Of in kort: **BaaS: Betekenis as a Service.**
 
 ## Wat doet de app?
 
@@ -54,8 +54,8 @@ Alles gebeurt in de browser. De invoer verlaat uw apparaat niet.
 
 Samen werken aan betekenis.  
 De Thesaurusdokter helpt u uw termen gezond en verbonden te houden.  
-**BaaS — Betekenis as a Service.**
+**BaaS: Betekenis as a Service.**
 
 ## Status
 
-Pilotversie v1.3 – Studiedag "De ruggengraat van het verbinden. Werken met termen."
+Pilotversie v1.3 - Studiedag "De ruggengraat van het verbinden. Werken met termen."
