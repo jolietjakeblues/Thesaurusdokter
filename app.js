@@ -15,11 +15,7 @@ function getCheckedSymptoms() {
   return selected;
 }
 
-// Ernst bepalen op basis van klachten
-// Regels:
-// - "geen_beheer" of "niet_vindbaar" => minstens "chronisch"
-// - combinatie "geen_beheer" + "niet_vindbaar" => "spoedgeval"
-// - niets aangevinkt => "licht"
+// Ernst bepalen
 function determineSeverity(symptoms) {
   const hasNoOwner = symptoms.includes("geen_beheer");
   const notFindable = symptoms.includes("niet_vindbaar");
@@ -36,7 +32,7 @@ function determineSeverity(symptoms) {
   return "Chronisch";
 }
 
-// Kernrisico's formuleren op basis van klachten
+// Kernrisico's
 function buildRisks(symptoms) {
   const risks = [];
 
@@ -62,7 +58,6 @@ function buildRisks(symptoms) {
     risks.push("Gebruikers kunnen materiaal niet betrouwbaar terugvinden.");
   }
 
-  // Anders / vrije tekst
   symptoms
     .filter(s => s.startsWith("anders:"))
     .forEach(s => {
@@ -157,7 +152,6 @@ function buildRecept(symptoms) {
     });
   }
 
-  // vrije tekst klacht → generieke slotbehandeling
   symptoms
     .filter(s => s.startsWith("anders:"))
     .forEach(s => {
@@ -204,7 +198,7 @@ function buildSummary(orgName, sourceName, severity) {
   base += "De huidige toestand wordt ingeschat als: " + severity + ". ";
 
   if (severity === "Spoedgeval") {
-    base += "Advies: pak governance en vindbaarheid snel op. Dit is een risico voor vindbaarheid, duurzaamheid en vertrouwen.";
+    base += "Advies: pak governance en vindbaarheid snel op. Dit raakt vindbaarheid, duurzaamheid en vertrouwen.";
   } else if (severity === "Chronisch") {
     base += "Advies: plan gericht herstel. Dit vraagt aandacht maar is beheersbaar.";
   } else {
@@ -245,9 +239,12 @@ function renderRecept(container, recepts) {
   });
 }
 
-      // PDF export
+// PDF export: dynamische pagina + vaste checklist
 async function exportPDF() {
   const { jsPDF } = window.jspdf;
+  const { PDFDocument } = window.PDFLib;
+
+  // 1. Bouw dynamische eerste PDF
   const doc = new jsPDF();
 
   const org = document.getElementById("orgName").value || "(organisatie onbekend)";
@@ -255,7 +252,6 @@ async function exportPDF() {
   const sev = document.getElementById("severityText").textContent || "";
   const finalStatus = document.getElementById("finalStatus").textContent || "";
 
-  // ---------- PAGINA 1 ----------
   let y = 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
@@ -269,7 +265,7 @@ async function exportPDF() {
   doc.text("Inschatting: " + sev, 10, y); y += 10;
 
   doc.setFont("helvetica", "bold");
-  doc.text("Advies van de Thesaurusdokter:", 10, y);
+  doc.text("Recept voor gezonde verbindingen:", 10, y);
   y += 6;
   doc.setFont("helvetica", "normal");
 
@@ -278,34 +274,22 @@ async function exportPDF() {
     const title = block.querySelector(".recept-item-title")?.textContent?.trim();
     if (!title) return;
 
-    // Titel van het receptblok
     doc.setFont("helvetica", "bold");
     doc.text("• " + title, 10, y);
     y += 5;
 
-    // Regels onder de titel
     doc.setFont("helvetica", "normal");
     const lines = [...block.querySelectorAll("div:not(.recept-item-title)")].map(div => div.textContent.trim());
     lines.forEach(line => {
-      if (y > 270) {
-        doc.addPage();
-        y = 10;
-      }
-      // tekst wrappen zodat regels niet buiten beeld lopen
+      if (y > 270) { doc.addPage(); y = 10; }
       const wrapped = doc.splitTextToSize("   " + line, 180);
-      wrapped.forEach(wline => {
-        doc.text(wline, 10, y);
-        y += 5;
-      });
+      wrapped.forEach(wline => { doc.text(wline, 10, y); y += 5; });
     });
 
     y += 3;
   });
 
-  if (y > 250) {
-    doc.addPage();
-    y = 10;
-  }
+  if (y > 250) { doc.addPage(); y = 10; }
 
   doc.setFont("helvetica", "bold");
   doc.text("Eindoordeel:", 10, y); 
@@ -320,146 +304,49 @@ async function exportPDF() {
   y += 10;
 
   doc.text(
-    "Spreekuur zonder wachtlijst. Raadpleeg bij twijfel uw Thesaurusdokter.",
+    "Samen werken aan betekenis. De Thesaurusdokter helpt u uw termen gezond en verbonden te houden.",
+    10,
+    y
+  );
+  y += 6;
+  doc.setFont("helvetica", "italic");
+  doc.text(
+    "BaaS — Betekenis as a Service.",
     10,
     y
   );
 
-  // ---------- PAGINA 2 ----------
-  doc.addPage();
+  // bytes van deze eerste PDF
+  const firstPdfBytes = doc.output("arraybuffer");
 
-  // Koptekst checklist
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("Gezondheidsverklaring (checklist)", 10, 20);
+  // 2. Haal vaste checklist-pdf op
+  const checklistUrl = "https://thesaurusdokter.nl/assets/gezondheidsverklaring-checklist.pdf";
+  const resp = await fetch(checklistUrl);
+  const checklistBytes = await resp.arrayBuffer();
 
-  // dun rood/grijs lijntje onder de kop voor visuele scheiding
-  doc.setDrawColor(150, 0, 0);     // donkerrood-achtig
-  doc.setLineWidth(0.3);
-  doc.line(10, 24, 200, 24);
+  // 3. Combineer met pdf-lib
+  const combined = await PDFDocument.create();
+  const firstPdf = await PDFDocument.load(firstPdfBytes);
+  const secondPdf = await PDFDocument.load(checklistBytes);
 
-  // We maken de tabeldata ASCII-safe. Geen rare Unicode (☐ etc.), maar [ ].
-  const tableData = [
-    ["Aspect", "Gezond", "Aandacht nodig"],
-    ["Er is een vaste beheerder", "[ ]", "[ ]"],
-    ["De lijst is gedocumenteerd (scope, licentie, structuur)", "[ ]", "[ ]"],
-    ["Terminologie is actueel en bruikbaar", "[ ]", "[ ]"],
-    ["Er zijn koppelingen met Termennetwerk of andere bronnen", "[ ]", "[ ]"],
-    ["Synoniemen en hiërarchie zijn gecontroleerd", "[ ]", "[ ]"],
-    ["Gebruikers geven feedback", "[ ]", "[ ]"],
-    ["Er is een exitstrategie bij onderhoudsstop", "[ ]", "[ ]"],
-    ["De bron is open beschikbaar (LOD)", "[ ]", "[ ]"],
-    ["Governance is vastgelegd", "[ ]", "[ ]"],
-    ["U herkent uw eigen termen zonder zoekpijn", "[ ]", "[ ]"]
-  ];
+  const firstPages = await combined.copyPages(firstPdf, firstPdf.getPageIndices());
+  firstPages.forEach(p => combined.addPage(p));
 
-  // 1. Mooie tabel via autoTable als die beschikbaar is
-  if (window.jspdf && window.jspdf.autoTable) {
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
+  const secondPages = await combined.copyPages(secondPdf, secondPdf.getPageIndices());
+  secondPages.forEach(p => combined.addPage(p));
 
-    doc.autoTable({
-      head: [tableData[0]],
-      body: tableData.slice(1),
-      startY: 30,
-      theme: 'grid',
-      styles: {
-        font: "helvetica",
-        fontSize: 10
-      },
-      headStyles: {
-        fillColor: [255, 230, 230],
-        textColor: [0, 0, 0]
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245]
-      }
-    });
+  const mergedBytes = await combined.save();
 
-  // 2. Onze eigen fallback als autoTable niet werkt / niet geladen is
-  } else {
-    let tableY = 32; // begin iets onder de lijn
-    const leftX = 10;
-    const colGezondX = 140;
-    const colAandachtX = 170;
-    const maxWidthAspect = 125;
-
-    // kolomtitels
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("Aspect", leftX, tableY);
-    doc.text("Gezond", colGezondX, tableY);
-    doc.text("Aandacht", colAandachtX, tableY);
-    tableY += 4;
-
-    // dun lijnetje onder de kolomtitels
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.2);
-    doc.line(leftX, tableY, 200, tableY);
-    tableY += 4;
-
-    // rijen
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-
-    tableData.slice(1).forEach((row, idx) => {
-      const [aspect, gezond, aandacht] = row;
-
-      // nieuwe pagina als we te ver zijn
-      if (tableY > 270) {
-        doc.addPage();
-        tableY = 20;
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.text("Aspect", leftX, tableY);
-        doc.text("Gezond", colGezondX, tableY);
-        doc.text("Aandacht", colAandachtX, tableY);
-        tableY += 4;
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.2);
-        doc.line(leftX, tableY, 200, tableY);
-        tableY += 4;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-      }
-
-      // subtiele grijstint achtergrond voor om-en-om rijen
-      if (idx % 2 === 0) {
-        doc.setFillColor(245, 245, 245); // lichtgrijs
-        // rechthoek op volledige rijhoogte (we tekenen 'm eerst, dan tekst erover)
-        // rijhoogte schatten we op ~8 + wrap. We tekenen dynamisch per regel.
-      }
-
-      // we maken de aspecttekst veilig ASCII (geen rare unicode quotes)
-      const safeAspect = aspect.replace(/[^\x00-\x7F]/g, "");
-      const wrappedAspect = doc.splitTextToSize(safeAspect, maxWidthAspect);
-
-      // we gaan eerst de achtergrond tekenen voor het aantal regels dat we straks schrijven
-      // bereken hoogte van deze rij:
-      const rowHeight = wrappedAspect.length * 6 + 2; // 6 per regel + marge
-
-      if (idx % 2 === 0) {
-        doc.rect(leftX - 2, tableY - 5, 192, rowHeight, "F");
-      }
-
-      // schrijf de tekstregels van de "Aspect" kolom
-      let innerY = tableY;
-      wrappedAspect.forEach((line, i) => {
-        doc.text(line, leftX, innerY);
-        // Gezond / Aandacht alleen op de eerste regel van deze rij
-        if (i === 0) {
-          doc.text(gezond, colGezondX, innerY);
-          doc.text(aandacht, colAandachtX, innerY);
-        }
-        innerY += 6;
-      });
-
-      tableY = tableY + rowHeight;
-    });
-  }
-
-  // Download
-  doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
+  // 4. Download
+  const blob = new Blob([mergedBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Gezondheidsverklaring_Thesaurusdokter.pdf";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 
