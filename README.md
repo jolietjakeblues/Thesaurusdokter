@@ -46,5 +46,15 @@ Deze webapp is ontwikkeld voor de **NDE Termendag** als lichte, humoristische ma
 
 ---
 
+## Versiegeschiedenis
+
+- **v1.1 – 28 oktober 2025**  
+  Toegevoegd: tweede pagina in PDF-export met Gezondheidsverklaring en automatische paginering.  
+  Verbeterd: PDF-functie volledig herschreven, typografie bijgewerkt.
+
+- **v1.0 – 25 oktober 2025**  
+  Eerste publieke release van de Thesaurusdokter-webapp voor de NDE Termendag.
+
+Zie [CHANGELOG.md](./CHANGELOG.md) voor alle details.
 > “Preventie is beter dan opschonen.  
 > Raadpleeg bij twijfel uw Thesaurusdokter.”
