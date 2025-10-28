@@ -1,0 +1,68 @@
+# Thesaurusdokter 2.0 – Van spreekuur naar diagnoseplatform
+
+**Werkversie – conceptvoorstel**
+
+## 1. Aanleiding
+De eerste Thesaurusdokter maakte terminologiebeheer zichtbaar en bespreekbaar op een luchtige manier.  
+Voor de volgende fase is behoefte aan een serieuzer instrument: een hulpmiddel dat organisaties helpt de kwaliteit en volwassenheid van hun termenbronnen te beoordelen.
+
+**Doel:** een praktische webtool die snel inzicht geeft in de gezondheid en volwassenheid van een thesaurus of vocabulaire.
+
+---
+
+## 2. Kernidee
+Van *"dokter met humor"* naar *"diagnosticus met data"*.  
+De gebruiker vult een korte vragenlijst in over beheer, actualiteit, gebruik en koppelingen.  
+De app berekent een score en genereert concrete verbeteradviezen, onderbouwd met bestaande standaarden.
+
+---
+
+## 3. Functionaliteiten
+
+| Categorie | Doel | Output |
+|------------|------|--------|
+| Beheer | Check op eigenaarschap, reviewcyclus, documentatie | Score + aanbeveling |
+| Actualiteit | Mate van onderhoud en vernieuwing | Chronisch / stabiel / up-to-date |
+| Gebruik | Aantal toepassingen, feedbackloop | Verbeterpunten |
+| Koppelingen | Interoperabiliteit en FAIR-conformiteit | Kwaliteitsniveau |
+| Governance | Rolverdeling en beleid | Aanbevolen actieplan |
+
+**Resultaat:**
+- Een radardiagram of gezondheidsschaal.
+- Samenvattend adviesrapport (PDF).
+- Optioneel: export naar JSON voor benchmarking.
+
+---
+
+## 4. Tone of voice
+- Professioneel, helder, zonder satire.
+- Gericht op data-stewards, informatiespecialisten, en domeinbeheerders.
+- Voorbeeldadvies:
+  > Uw terminologiebron voldoet grotendeels aan de FAIR-principes.  
+  > Advies: versterk koppelingen met externe vocabularia en leg gebruikscontext vast.
+
+---
+
+## 5. Techniek
+- Front-end: **Vanilla JS** of lichte **Vue**-componenten.
+- Datamodel: JSON met vaste categorieën en scoreberekening.
+- Rapportage: `jsPDF` of `pdfmake`.
+- Hosting: GitHub Pages (`thesaurusdokter.nl/2.0`).
+
+---
+
+## 6. Inspiratie en referenties
+- ISO 25964 (Thesauri and interoperability with other vocabularies)  
+- FAIR data principles  
+- Termennetwerk Nederland  
+- Metadata-maturity modellen
+
+---
+
+## 7. Toekomst
+De Thesaurusdokter 2.0 groeit uit tot een **Betekenis-as-a-Service (BaaS)**-instrument:  
+een platform dat terminologiebeheer ondersteunt, visualiseert en professionaliseert.
+
+---
+
+*Laatste bewerking: oktober 2025*
