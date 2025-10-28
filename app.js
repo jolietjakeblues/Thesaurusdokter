@@ -330,3 +330,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   downloadBtn.addEventListener("click", exportPDF);
 });
+// Voeg gezondheidsverklaring toe
+doc.addPage();
+doc.text("Gezondheidsverklaring", 10, 20);
+
+const tableData = [
+  ["Aspect", "Gezond", "Aandacht nodig"],
+  ["Er is een vaste beheerder", "☐", "☐"],
+  ["De lijst is gedocumenteerd (scope, licentie, structuur)", "☐", "☐"],
+  ["Terminologie is actueel en bruikbaar", "☐", "☐"],
+  ["Er zijn koppelingen met Termennetwerk of andere bronnen", "☐", "☐"],
+  ["Synoniemen en hiërarchie zijn gecontroleerd", "☐", "☐"],
+  ["Gebruikers geven feedback", "☐", "☐"],
+  ["Er is een exitstrategie bij onderhoudsstop", "☐", "☐"],
+  ["De bron is open beschikbaar (LOD)", "☐", "☐"],
+  ["Governance is vastgelegd", "☐", "☐"],
+  ["U herkent uw eigen termen zonder zoekpijn", "☐", "☐"]
+];
+
+// Gebruik jsPDF autoTable als die is geladen
+if (window.jspdf && window.jspdf.autoTable) {
+  doc.autoTable({
+    head: [tableData[0]],
+    body: tableData.slice(1),
+    startY: 30,
+    theme: 'grid'
+  });
+}
