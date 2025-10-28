@@ -252,9 +252,10 @@ async function exportPDF() {
 
   const org = document.getElementById("orgName").value || "(organisatie onbekend)";
   const src = document.getElementById("sourceName").value || "(bron onbekend)";
-  const sev = document.getElementById("severityText").textContent;
-  const finalStatus = document.getElementById("finalStatus").textContent;
+  const sev = document.getElementById("severityText").textContent || "";
+  const finalStatus = document.getElementById("finalStatus").textContent || "";
 
+  // PAGINA 1
   let y = 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
@@ -268,33 +269,121 @@ async function exportPDF() {
   doc.text("Inschatting: " + sev, 10, y); y += 10;
 
   doc.setFont("helvetica", "bold");
-  doc.text("Advies van de Thesaurusdokter:", 10, y); y += 6;
+  doc.text("Advies van de Thesaurusdokter:", 10, y);
+  y += 6;
   doc.setFont("helvetica", "normal");
 
   const receptItems = document.querySelectorAll(".recept-item");
   receptItems.forEach(block => {
-    const title = block.querySelector(".recept-item-title").textContent;
+    const title = block.querySelector(".recept-item-title")?.textContent?.trim();
+    if (!title) return;
+
+    // Titel
+    doc.setFont("helvetica", "bold");
     doc.text("• " + title, 10, y);
     y += 5;
-    const lines = [...block.querySelectorAll("div:not(.recept-item-title)")].map(div => div.textContent);
+
+    // Regels onder de titel
+    doc.setFont("helvetica", "normal");
+    const lines = [...block.querySelectorAll("div:not(.recept-item-title)")].map(div => div.textContent.trim());
     lines.forEach(line => {
+      if (y > 270) {
+        doc.addPage();
+        y = 10;
+      }
       doc.text("   " + line, 10, y);
       y += 5;
     });
+
     y += 3;
   });
 
-  y += 5;
+  if (y > 250) {
+    doc.addPage();
+    y = 10;
+  }
+
   doc.setFont("helvetica", "bold");
-  doc.text("Eindoordeel:", 10, y); y += 6;
+  doc.text("Eindoordeel:", 10, y); 
+  y += 6;
   doc.setFont("helvetica", "normal");
-  doc.text(finalStatus, 10, y); y += 10;
+  doc.text(finalStatus || sev || "(geen status)", 10, y);
+  y += 10;
 
-  doc.text("Handtekening dokter: ___________________________", 10, y); y += 6;
-  doc.text("Datum: ___________________________", 10, y); y += 10;
+  doc.text("Handtekening dokter: ___________________________", 10, y); 
+  y += 6;
+  doc.text("Datum: ___________________________", 10, y); 
+  y += 10;
 
-  doc.text("Spreekuur zonder wachtlijst. Raadpleeg bij twijfel uw Thesaurusdokter.", 10, y);
+  doc.text(
+    "Spreekuur zonder wachtlijst. Raadpleeg bij twijfel uw Thesaurusdokter.",
+    10,
+    y
+  );
 
+  // PAGINA 2
+  doc.addPage();
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Gezondheidsverklaring (checklist)", 10, 20);
+
+  const tableData = [
+    ["Aspect", "Gezond", "Aandacht nodig"],
+    ["Er is een vaste beheerder", "☐", "☐"],
+    ["De lijst is gedocumenteerd (scope, licentie, structuur)", "☐", "☐"],
+    ["Terminologie is actueel en bruikbaar", "☐", "☐"],
+    ["Er zijn koppelingen met Termennetwerk of andere bronnen", "☐", "☐"],
+    ["Synoniemen en hiërarchie zijn gecontroleerd", "☐", "☐"],
+    ["Gebruikers geven feedback", "☐", "☐"],
+    ["Er is een exitstrategie bij onderhoudsstop", "☐", "☐"],
+    ["De bron is open beschikbaar (LOD)", "☐", "☐"],
+    ["Governance is vastgelegd", "☐", "☐"],
+    ["U herkent uw eigen termen zonder zoekpijn", "☐", "☐"]
+  ];
+
+  // Heeft de browser autoTable?
+  if (window.jspdf && window.jspdf.autoTable) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
+    doc.autoTable({
+      head: [tableData[0]],
+      body: tableData.slice(1),
+      startY: 30,
+      theme: 'grid',
+      styles: {
+        font: "helvetica",
+        fontSize: 10
+      },
+      headStyles: {
+        fillColor: [255, 230, 230],
+        textColor: [0, 0, 0]
+      }
+    });
+  } else {
+    // Fallback als autoTable niet geladen is
+    let tableY = 30;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+
+    tableData.forEach((row, idx) => {
+      const line = row.join(" | ");
+      if (tableY > 270) {
+        doc.addPage();
+        tableY = 20;
+      }
+      if (idx === 0) {
+        doc.setFont("helvetica", "bold");
+        doc.text(line, 10, tableY);
+        doc.setFont("helvetica", "normal");
+      } else {
+        doc.text(line, 10, tableY);
+      }
+      tableY += 7;
+    });
+  }
+
+  // Download
   doc.save("Gezondheidsverklaring_Thesaurusdokter.pdf");
 }
 
@@ -330,30 +419,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   downloadBtn.addEventListener("click", exportPDF);
 });
-// Voeg gezondheidsverklaring toe
-doc.addPage();
-doc.text("Gezondheidsverklaring", 10, 20);
-
-const tableData = [
-  ["Aspect", "Gezond", "Aandacht nodig"],
-  ["Er is een vaste beheerder", "☐", "☐"],
-  ["De lijst is gedocumenteerd (scope, licentie, structuur)", "☐", "☐"],
-  ["Terminologie is actueel en bruikbaar", "☐", "☐"],
-  ["Er zijn koppelingen met Termennetwerk of andere bronnen", "☐", "☐"],
-  ["Synoniemen en hiërarchie zijn gecontroleerd", "☐", "☐"],
-  ["Gebruikers geven feedback", "☐", "☐"],
-  ["Er is een exitstrategie bij onderhoudsstop", "☐", "☐"],
-  ["De bron is open beschikbaar (LOD)", "☐", "☐"],
-  ["Governance is vastgelegd", "☐", "☐"],
-  ["U herkent uw eigen termen zonder zoekpijn", "☐", "☐"]
-];
-
-// Gebruik jsPDF autoTable als die is geladen
-if (window.jspdf && window.jspdf.autoTable) {
-  doc.autoTable({
-    head: [tableData[0]],
-    body: tableData.slice(1),
-    startY: 30,
-    theme: 'grid'
-  });
-}
